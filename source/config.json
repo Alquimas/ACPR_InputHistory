@@ -1,0 +1,14 @@
+{
+    "$schema": "https://raw.githubusercontent.com/YouKnow232/GearLoader/refs/heads/main/schema/0.1.0/config.schema.json",
+    "name": "ACPR_InputHistory",
+    "entryPoint": "ACPR_InputHistory.dll",
+    "version": "0.1.0",
+    "modLoaderVersion": "0.1.0",
+    "dependencies": [
+        {
+            "name": "baseMod",
+            "version": "1.1.0",
+            "optional": false
+        }
+    ]
+}
