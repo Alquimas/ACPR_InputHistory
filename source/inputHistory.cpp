@@ -4,6 +4,7 @@
 
 #include "gearLoader/gearLoader.hpp"
 #include "baseMod/baseMod.hpp"
+#include "frameStepping.h"
 
 namespace {
 
@@ -460,12 +461,8 @@ void RegisterModMenu(BaseMod::Api* api) {
     api->ModMenu.RegisterMenuTab("INPUT HISTORY", modMenuEntries, 4);
 }
 
-void BASEMOD_CALL AfterGameUpdate(
-    ModContext* context,
-    const BaseMod_HookContext*,
-    const BaseMod_GameUpdateInfo*) {
-
-    auto& game = context->baseModApi->GameData;
+bool IsInputHistoryModeActive(BaseMod::Api* api) {
+    auto& game = api->GameData;
     // The online menu value can contain upper-byte state (0x01010003 was
     // observed in Online Training); its low byte still identifies ONLINE.
     const uint32_t menuItem =
@@ -477,10 +474,32 @@ void BASEMOD_CALL AfterGameUpdate(
     const bool trainingMenu =
         menuItem == static_cast<uint32_t>(ggxxacpr::MenuItem::TRAINING) ||
         menuItem == static_cast<uint32_t>(ggxxacpr::MenuItem::ONLINE);
-    const bool trainingBattle = battleActive && trainingMenu &&
+
+    return battleActive && trainingMenu &&
         (gameModeFlags & GAME_MODE_FEATURE_FLAGS_TRAINING) != 0;
+}
+
+void BASEMOD_CALL BeforeGameUpdate(
+    ModContext* context,
+    const BaseMod_HookContext*,
+    const BaseMod_GameUpdateInfo*) {
+    if (IsInputHistoryModeActive(context->baseModApi)) {
+        HandleFrameStepping_PreUpdate(context->baseModApi);
+    }
+}
+
+void BASEMOD_CALL AfterGameUpdate(
+    ModContext* context,
+    const BaseMod_HookContext*,
+    const BaseMod_GameUpdateInfo*) {
+
+    auto& game = context->baseModApi->GameData;
+    const bool trainingBattle = IsInputHistoryModeActive(context->baseModApi);
+    const uint32_t gameModeFlags =
+        static_cast<uint32_t>(game.GetGameModeFeatureFlags());
 
     if (!trainingBattle) {
+        HandleFrameStepping_PostUpdate(context->baseModApi);
         ClearTrainingHistory();
         return;
     }
@@ -510,6 +529,9 @@ void BASEMOD_CALL AfterGameUpdate(
         }
     }
 
+    // Sample the stepped update before restoring the raw input and re-pausing.
+    HandleFrameStepping_PostUpdate(context->baseModApi);
+
     if (context->display) {
         DrawNativeHistory(inputMaps, context->opacity, context->zPos);
     }
@@ -537,6 +559,9 @@ GEARLOADER_EXPORT void GEARLOADER_CALL Init(
 
     LoadSettings();
     modContext.baseModApi = new BaseMod::Api(baseModCApi);
+    modContext.baseModApi->Hooks.BeforeGameUpdate<ModContext>(
+        BeforeGameUpdate,
+        &modContext);
     modContext.baseModApi->Hooks.AfterGameUpdate<ModContext>(
         AfterGameUpdate,
         &modContext);

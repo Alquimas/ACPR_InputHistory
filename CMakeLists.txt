@@ -9,6 +9,7 @@ set(BIN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
 add_library(acpr_input_history SHARED
     source/inputHistory.cpp
+    source/frameStepping.cpp
 )
 target_include_directories(acpr_input_history PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include

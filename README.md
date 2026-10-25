@@ -30,6 +30,26 @@ Guilty Gear XX Accent Core Plus R/
 
 This mod features a settings menu that can be found at "Pause Menu -> Help & Options -> Mod Settings".
 
+## Training frame stepping
+<div align="center">
+  <img src="./docs/img/Preview3.jpg" width="480" align="center" alt="Settings Menu"/>
+  <br/>
+</div>
+
+While the mod is active, press the configured `EnemyWalk` binding with
+the game paused and the pause menu hidden to advance one update. This is
+available only in the Training and Online Waiting modes supported by this mod.
+
+Some examples of usage are:
+
+- Pressing `EnemyWalk` alone so the next input is neutral;
+- Holding `P` and then pressing `EnemyWalk` so the next input is `P`;
+- And so on.
+
+This feature was not tested with P2 inputs, and feedback for it is welcome.
+
+Backwards stepping is currently not supported.
+
 ## Build Instructions
 Build instructions are similar to [GearLoader's](https://github.com/YouKnow232/GearLoader).
 
