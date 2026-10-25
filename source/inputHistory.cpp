@@ -501,12 +501,12 @@ void BASEMOD_CALL AfterGameUpdate(
             ClearTrainingHistory();
             trainingHistoryActive = true;
         } else {
+            // Raw1 is current accepted state. Raw2 is the previous state
+            // and would keep a released input visible for one extra row.
             AppendInputRun(trainingHistory[0],
-                (input[0].InputRaw1 | input[0].InputRaw2) &
-                    InputFilterMask(&inputMaps[0]));
+                input[0].InputRaw1 & InputFilterMask(&inputMaps[0]));
             AppendInputRun(trainingHistory[1],
-                (input[1].InputRaw1 | input[1].InputRaw2) &
-                    InputFilterMask(&inputMaps[1]));
+                input[1].InputRaw1 & InputFilterMask(&inputMaps[1]));
         }
     }
 
